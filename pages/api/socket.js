@@ -6,7 +6,7 @@ const ioHandler = (req, res) => {
         const io = new Server(res.socket.server);
 
         io.on("connection", (socket) => {
-            console.log("Connected : ",socket.id);
+            socket.broadcast.emit("newUser", { id: socket.id });
             socket.on("send-message", (obj) => {
                 socket.broadcast.emit("receive-message", obj);
             });
