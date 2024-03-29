@@ -7,7 +7,6 @@ let socket;
 const Home = () => {
   const [message, setMessage] = useState('');
   const [list, setList] = useState([]);
-  const [left, setleft] = useState(false)
   const ref = useRef(null);
 
   useEffect(() => {
@@ -25,8 +24,7 @@ const Home = () => {
     socket = io();
 
     socket.on("receive-message", (data) => {
-      setList(list => [...list, data.message]);
-      setleft(false);
+      setList(list => [...list, { message: data.message, recv: true }]);
     });
   }
 
@@ -36,8 +34,8 @@ const Home = () => {
       socket.emit("send-message", {
         message
       });
+      setList(list => [...list, { message, recv: false }]);
       setMessage("");
-      setleft(true);
     }
   }
 
@@ -49,12 +47,12 @@ const Home = () => {
 
   return (
     <div className="h-[90vh] w-screen bg-white flex flex-col justify-end" >
-      <div className='w-full overflow-y-scroll pl-20'>
+      <div className='w-full overflow-y-scroll'>
         <ul className="scroll-smooth flex flex-col" ref={ref}>
           {
             list.map((ele, index) => {
-              return <li className={`w-1/3 whitespace-pre-line break-words ml-10 p-5 my-2 mr-10 rounded-lg rounded-tl-xl rounded-br-xl bg-green-300 ${left ? " self-end" : " self-start"}`}
-                key={index}>{ele}<br /></li>
+              return <li className={`w-1/3 whitespace-pre-line break-words ml-[7rem] p-5 my-2 mr-[7rem] rounded-lg rounded-tl-xl rounded-br-xl ${ele.recv ? "self-start bg-green-200" : "self-end bg-gray-200"}`}
+                key={index}>{ele.message}<br /></li>
             })
           }
         </ul>
