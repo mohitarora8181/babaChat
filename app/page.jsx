@@ -1,31 +1,40 @@
 'use client'
 import { useEffect, useState, useRef } from 'react'
-import { IoImages, IoSend } from "react-icons/io5";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import io from 'socket.io-client';
+import LoginButton from './components/LoginButton';
+import SendMessageForm from './components/SendMessageForm';
+import { useSession } from 'next-auth/react';
 
 let socket;
 const Home = () => {
   const [message, setMessage] = useState('');
   const [list, setList] = useState([]);
+  const [currentUser, setcurrentUser] = useState(null);
   const ref = useRef(null);
+
+  const { data: session } = useSession();
 
   useEffect(() => {
     ref.current?.lastElementChild?.scrollIntoView()
   }, [list])
 
   useEffect(() => {
-    socketInitializer();
-
-  }, []);
+    if (session) {
+      if (currentUser == null && session) {
+        socketInitializer();
+        setcurrentUser(session);
+      }
+    }
+  }, [session])
 
   async function socketInitializer() {
     await fetch("/api/socket");
-
     socket = io();
-    socket.on("newUser", (id) => {
-      toast('New User Joined', {
+    socket.emit("newUserJoined", (session ? session.user.name : "New"));
+    socket.on("newUser", ({ id, name }) => {
+      toast(`${name} Joined`, {
         position: "top-right",
         autoClose: 2000,
         hideProgressBar: false,
@@ -35,10 +44,9 @@ const Home = () => {
         progress: undefined,
         theme: "light",
       });
-      console.log("user connected", id);
-    });
+    })
     socket.on("receive-message", (data) => {
-      setList(list => [...list, { message: data.message, recv: true }]);
+      setList(list => [...list, { message: data.message, recv: true, sender: data.sender }]);
     });
   }
 
@@ -46,9 +54,10 @@ const Home = () => {
     e.preventDefault();
     if (!message) { return }
     socket.emit("send-message", {
-      message
+      message,
+      sender: session.user
     });
-    setList(list => [...list, { message, recv: false }]);
+    setList(list => [...list, { message, recv: false, sender: { name: "Me" ,image:session.user.image} }]);
     setMessage("");
   }
 
@@ -63,32 +72,31 @@ const Home = () => {
 
   return (
     <>
-      <div className="h-screen w-screen bg-white flex flex-col justify-end" >
+      <div className="h-[98vh] pt-20 w-screen bg-white flex flex-col justify-end" >
         <div className='w-full overflow-y-scroll scrollbar-thin'>
           <ul className="scroll-smooth flex flex-col" ref={ref}>
             {
               list.map((ele, index) => {
-                return <li className={`w-1/3 max-sm:w-1/2 whitespace-pre-line break-words max-sm:mx-[1.5rem] mx-[7rem] p-5 max-sm:p-2 my-2 rounded-lg rounded-tl-xl rounded-br-xl ${ele.recv ? "self-start bg-green-200" : "self-end bg-gray-200"}`}
-                  key={index}>{ele.message}</li>
+                return <li className={`w-1/3 max-sm:w-1/2 max-sm:mx-[1.5rem] mx-[7rem] ${ele.recv ? "self-start" : "self-end"}`}
+                  key={index}>
+                  {
+                    list[index - 1] && list[index - 1].sender.name == ele.sender.name ? "" :
+                      <div className={`flex gap-x-2 ${ele.recv ? "-ml-14 justify-start" : "justify-end"}`}>
+                        {ele.sender.name != "Me" && <img className='h-[48px] -ml-3 rounded-full self-center' src={ele.sender.image}></img>}
+                        <p className={`text-sm font-semibold mx-5 self-center`}>
+                          {ele.sender.name}
+                        </p>
+                        {ele.sender.name === "Me" && <img className='h-[48px] -mr-14 rounded-full self-center' src={ele.sender.image}></img>}
+                      </div>
+                  }
+                  <p className={`whitespace-pre-line break-words p-5 max-sm:p-2 my-1 rounded-lg rounded-tl-xl rounded-br-xl ${ele.recv ? "self-start bg-green-200" : "self-end bg-gray-200"}`}>{ele.message}</p>
+                </li>
               })
             }
           </ul>
         </div>
-        <form className='flex justify-center h-[6rem] max-sm:h-[5.7rem]'>
-          <div className=' w-11/12 max-sm:w-full max-sm:px-3 p-5 flex justify-between'>
-            <textarea className='border scrollbar-none border-black border-opacity-10 resize-none outline-none w-full p-3 pl-6 rounded-full align-middle shadow-lg shadow-gray-100'
-              type='text'
-              value={message}
-              onChange={(e) => { setMessage(e.target.value) }} placeholder='Type a message ...'
-              onKeyDown={handleKeypress}
-            ></textarea>
-            <div className={`px-3 self-center -ml-20 mx-2 w-[3rem] h-[3rem] max-sm:h-[2.5rem] max-sm:w-[2.5rem] cursor-pointer border-none bg-green-500 rounded-full ${message ? "opacity-100" : "opacity-50"} hover:opacity-50 flex justify-center gap-x-2`} onClick={handleSend}>
-              <button className=' text-white select-none'>
-                <IoSend className='self-center text-white select-none' />
-              </button>
-            </div>
-          </div>
-        </form>
+        <LoginButton />
+        <SendMessageForm message={message} setMessage={setMessage} handleKeypress={handleKeypress} handleSend={handleSend} />
       </div>
       <ToastContainer />
     </>
