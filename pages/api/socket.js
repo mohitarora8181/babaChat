@@ -4,6 +4,9 @@ const ioHandler = (req, res) => {
         console.log('*First use, starting socket.io');
         const io = new Server(res.socket.server);
         io.on("connection", (socket) => {
+            socket.on("disconnecting", () => {
+                socket.broadcast.emit("user-disconnected","disconnected")
+            });
             socket.on("newUserJoined", (name) => {
                 socket.broadcast.emit("newUser", { id: socket.id, name: name });
             })

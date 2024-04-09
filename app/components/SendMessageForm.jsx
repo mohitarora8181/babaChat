@@ -10,6 +10,7 @@ const SendMessageForm = ({ message, setMessage, handleKeypress, handleSend }) =>
                     <textarea className='border scrollbar-none border-black border-opacity-10 resize-none outline-none w-full p-3 pl-6 rounded-full align-middle shadow-lg shadow-gray-100'
                         type='text'
                         value={message}
+                        autoFocus
                         onChange={(e) => { setMessage(e.target.value) }} placeholder='Type a message ...'
                         onKeyDown={handleKeypress}
                     ></textarea>
