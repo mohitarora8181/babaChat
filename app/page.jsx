@@ -13,6 +13,7 @@ const Home = () => {
   const [list, setList] = useState([]);
   const [currentUser, setcurrentUser] = useState(null);
   const ref = useRef(null);
+  const sendButton = useRef(null);
 
   const { data: session } = useSession();
 
@@ -46,15 +47,15 @@ const Home = () => {
       });
     })
     socket.on("user-disconnected", () => {
-      toast(`User leave`, {
-        position: "top-right",
-        autoClose: 2000,
+      toast(`someone leaved`, {
+        position: "top-left",
+        autoClose: 1000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: false,
         draggable: true,
         progress: undefined,
-        theme: "light",
+        theme: "dark",
       });
     })
     socket.on("receive-message", (data) => {
@@ -64,6 +65,7 @@ const Home = () => {
 
   function handleSend(e) {
     e.preventDefault();
+    sendButton.current?.focus();
     if (!message) { return }
     socket.emit("send-message", {
       message,
@@ -108,7 +110,7 @@ const Home = () => {
           </ul>
         </div>
         <LoginButton />
-        <SendMessageForm message={message} setMessage={setMessage} handleKeypress={handleKeypress} handleSend={handleSend} />
+        <SendMessageForm message={message} sendButton={sendButton} setMessage={setMessage} handleKeypress={handleKeypress} handleSend={handleSend} />
       </div>
       <ToastContainer />
     </>

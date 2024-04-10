@@ -9,7 +9,7 @@ const ioHandler = (req, res) => {
             });
             socket.on("newUserJoined", (name) => {
                 socket.broadcast.emit("newUser", { id: socket.id, name: name });
-            })
+            });
             socket.on("send-message", (obj) => {
                 socket.broadcast.emit("receive-message", obj);
             });
