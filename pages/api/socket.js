@@ -5,13 +5,13 @@ const ioHandler = (req, res) => {
         const io = new Server(res.socket.server);
         io.on("connection", (socket) => {
             socket.on("disconnecting", () => {
-                socket.broadcast.emit("user-disconnected","disconnected")
+                // socket.broadcast.emit("user-disconnected","disconnected")
             });
             socket.on("newUserJoined", (name) => {
                 socket.broadcast.emit("newUser", { id: socket.id, name: name });
             });
             socket.on("send-message", (obj) => {
-                socket.broadcast.emit("receive-message", obj);
+                socket.broadcast.emit(`receive-message`, obj);
             });
         });
 

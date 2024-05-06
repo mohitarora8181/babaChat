@@ -6,12 +6,21 @@ import io from 'socket.io-client';
 import LoginButton from './components/LoginButton';
 import SendMessageForm from './components/SendMessageForm';
 import { useSession } from 'next-auth/react';
+import ChatElements from './components/ChatElements';
+import AllUsers from './components/AllUsers';
+import { firestore } from "@firebase";
+import { doc, setDoc } from "firebase/firestore";
+import Loader from './components/Loader';
+import Header from './components/Header';
 
 let socket;
 const Home = () => {
   const [message, setMessage] = useState('');
   const [list, setList] = useState([]);
+  const [relation, setRelation] = useState("");
+  const [activeUser, setActiveUser] = useState({});
   const [currentUser, setcurrentUser] = useState(null);
+  const [loading, setLoading] = useState(false);
   const ref = useRef(null);
   const sendButton = useRef(null);
 
@@ -26,25 +35,27 @@ const Home = () => {
       if (currentUser == null && session) {
         socketInitializer();
         setcurrentUser(session);
+        localStorage.removeItem("relation")
       }
     }
   }, [session])
+
 
   async function socketInitializer() {
     await fetch("/api/socket");
     socket = io();
     socket.emit("newUserJoined", (session ? session.user.name : "New"));
     socket.on("newUser", ({ id, name }) => {
-      toast(`${name} Joined`, {
-        position: "top-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+      // toast(`${name} Joined`, {
+      //   position: "top-right",
+      //   autoClose: 2000,
+      //   hideProgressBar: false,
+      //   closeOnClick: true,
+      //   pauseOnHover: false,
+      //   draggable: true,
+      //   progress: undefined,
+      //   theme: "light",
+      // });
     })
     socket.on("user-disconnected", () => {
       toast(`someone leaved`, {
@@ -58,20 +69,29 @@ const Home = () => {
         theme: "dark",
       });
     })
-    socket.on("receive-message", (data) => {
-      setList(list => [...list, { message: data.message, recv: true, sender: data.sender }]);
+
+    socket.on(`receive-message`, (data) => {
+      let relDraft = "";
+      if (localStorage.getItem("relation")) {
+        relDraft = atob(localStorage.getItem("relation"));
+      }
+      if (relDraft == data.relation) {
+        setList(list => [...list, { message: data.message, recv: true, sender: data.sender }]);
+      }
     });
   }
 
-  function handleSend(e) {
+  async function handleSend(e) {
     e.preventDefault();
-    sendButton.current?.focus();
     if (!message) { return }
     socket.emit("send-message", {
       message,
-      sender: session.user
+      sender: session.user,
+      relation
     });
+    storeinDB(session.user, message);
     setList(list => [...list, { message, recv: false, sender: { name: "Me", image: session.user.image } }]);
+    sendButton.current?.focus();
     setMessage("");
   }
 
@@ -84,36 +104,43 @@ const Home = () => {
     }
   }
 
+  const storeinDB = async (sender, inMessage) => {
+    try {
+      const timestamp = new Date();
+      const year = timestamp.getFullYear();
+      const month = timestamp.getMonth() + 1;
+      const day = timestamp.getDate();
+      const perfectDate = day.toString() + "-" + month.toString() + "-" + year;
+      const document = doc(firestore, relation.toString(), perfectDate);
+      await setDoc(document, {
+        [timestamp.getTime()]: {
+          message: inMessage,
+          sender,
+        }
+      }, { merge: true })
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
-    <>
-      <div className="h-[98vh] pt-20 w-screen bg-white flex flex-col justify-end" >
+    <div className='flex bg-white'>
+      <AllUsers setRelation={setRelation} relation={relation} setList={setList} setActiveUser={setActiveUser} setLoading={setLoading} />
+      <div className="h-[98vh] pt-40 w-3/4 max-sm:w-screen bg-white flex flex-col justify-end" >
+        {relation && <Header activeUser={activeUser} />}
         <div className='w-full overflow-y-scroll scrollbar-thin'>
           <ul className="scroll-smooth flex flex-col" ref={ref}>
-            {
-              list.map((ele, index) => {
-                return <li className={`w-1/3 max-sm:w-3/5 max-sm:mx-[1.5rem] mx-[7rem] ${ele.recv ? "self-start" : "self-end"}`}
-                  key={index}>
-                  {
-                    list[index - 1] && list[index - 1].sender.name == ele.sender.name ? "" :
-                      <div className={`flex gap-x-2 ${ele.recv ? "-ml-14 max-sm:-ml-0 justify-start" : "justify-end"}`}>
-                        {ele.sender.name != "Me" && <img className='h-[48px] -ml-3 max-sm:h-[30px] rounded-full self-center' src={ele.sender.image}></img>}
-                        <p className={`text-sm font-semibold mx-5 max-sm:mx-1 self-center`}>
-                          {ele.sender.name}
-                        </p>
-                        {ele.sender.name === "Me" && <img className='h-[48px] -mr-14 max-sm:-mr-2 max-sm:h-[30px] rounded-full self-center' src={ele.sender.image}></img>}
-                      </div>
-                  }
-                  <p className={`whitespace-pre-line break-words p-5 max-sm:p-2 my-1 rounded-lg rounded-tl-2xl rounded-br-2xl ${ele.recv ? "self-start bg-gradient-to-br from-green-200 to bg-green-100" : "self-end bg-gradient-to-br from-gray-200 to-gray-100"}`}>{ele.message}</p>
-                </li>
-              })
-            }
+            <ChatElements list={list} />
           </ul>
         </div>
+        {
+          loading && <Loader />
+        }
         <LoginButton />
         <SendMessageForm message={message} sendButton={sendButton} setMessage={setMessage} handleKeypress={handleKeypress} handleSend={handleSend} />
       </div>
       <ToastContainer />
-    </>
+    </div>
   )
 }
 

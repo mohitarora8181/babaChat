@@ -1,9 +1,21 @@
-import { useSession, signIn, signOut } from "next-auth/react"
+import { useSession, signIn } from "next-auth/react"
 import { FcGoogle } from "react-icons/fc";
+import { ref, set } from "firebase/database";
+import database from "@firebase";
 
 
 export default function LoginButton() {
-    const { data: session } = useSession()
+    const { data: session } = useSession();
+    if (session) {
+        let user = (session.user.email).split("@")[0];
+        let unicode = "";
+        for(let i=0;i<user.length;i++){
+            unicode += user.charCodeAt(i)
+        }
+        session.user.babaCode = unicode;
+        user = user.replaceAll(".", "").replaceAll("#", "").replaceAll("[", "").replaceAll("]", "");
+        set(ref(database, 'users/' + user), session.user);
+    }
     if (!session) {
         return (
             <div className="w-full align-middle flex justify-center">
