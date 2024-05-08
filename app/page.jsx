@@ -124,7 +124,7 @@ const Home = () => {
   }
 
   return (
-    <div className='flex bg-white'>
+    <div className='flex bg-white select-none'>
       <AllUsers setRelation={setRelation} relation={relation} setList={setList} setActiveUser={setActiveUser} setLoading={setLoading} />
       <div className="h-[98vh] pt-40 w-3/4 max-sm:w-screen bg-white flex flex-col justify-end" >
         {relation && <Header activeUser={activeUser} />}
@@ -137,7 +137,7 @@ const Home = () => {
           loading && <Loader />
         }
         <LoginButton />
-        <SendMessageForm message={message} sendButton={sendButton} setMessage={setMessage} handleKeypress={handleKeypress} handleSend={handleSend} />
+        {relation && <SendMessageForm message={message} sendButton={sendButton} setMessage={setMessage} handleKeypress={handleKeypress} handleSend={handleSend} />}
       </div>
       <ToastContainer />
     </div>
