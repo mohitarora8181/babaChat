@@ -15,14 +15,23 @@ import Header from './components/Header';
 
 let socket;
 const Home = () => {
+  const timestamp = new Date();
+  const year = timestamp.getFullYear();
+  const month = timestamp.getMonth() + 1;
+  const day = timestamp.getDate();
+  const today = day.toString() + "-" + month.toString() + "-" + year;
+
   const [message, setMessage] = useState('');
   const [list, setList] = useState([]);
   const [relation, setRelation] = useState("");
   const [activeUser, setActiveUser] = useState({});
   const [currentUser, setcurrentUser] = useState(null);
+  const [chatDates, setChatDates] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [perfectDate, setPerfectDate] = useState(today);
   const ref = useRef(null);
   const sendButton = useRef(null);
+
 
   const { data: session } = useSession();
 
@@ -106,12 +115,7 @@ const Home = () => {
 
   const storeinDB = async (sender, inMessage) => {
     try {
-      const timestamp = new Date();
-      const year = timestamp.getFullYear();
-      const month = timestamp.getMonth() + 1;
-      const day = timestamp.getDate();
-      const perfectDate = day.toString() + "-" + month.toString() + "-" + year;
-      const document = doc(firestore, relation.toString(), perfectDate);
+      const document = doc(firestore, relation.toString(), today);
       await setDoc(document, {
         [timestamp.getTime()]: {
           message: inMessage,
@@ -121,14 +125,17 @@ const Home = () => {
     } catch (error) {
       console.log(error);
     }
+    if(perfectDate != today){
+      setPerfectDate(today);
+    }
   }
 
   return (
     <div className='flex bg-white select-none'>
-      <AllUsers setRelation={setRelation} relation={relation} setList={setList} setActiveUser={setActiveUser} setLoading={setLoading} />
-      <div className="h-[98vh] pt-40 w-3/4 max-sm:w-screen bg-white flex flex-col justify-end" >
-        {relation && <Header activeUser={activeUser} />}
-        <div className='w-full overflow-y-scroll scrollbar-thin'>
+      <AllUsers setRelation={setRelation} relation={relation} setList={setList} setActiveUser={setActiveUser} setLoading={setLoading} setChatDates={setChatDates} perfectDate={perfectDate} />
+      <div className="h-[98vh] pt-44 w-full max-sm:w-screen bg-white flex flex-col justify-end" >
+        {relation && <Header activeUser={activeUser} chatDates={chatDates} setPerfectDate={setPerfectDate} today={today}  />}
+        <div className={`w-full overflow-y-scroll scrollbar-thin ${perfectDate == today ? "mb-0" :"mb-10"}`}>
           <ul className="scroll-smooth flex flex-col" ref={ref}>
             <ChatElements list={list} />
           </ul>
@@ -137,7 +144,7 @@ const Home = () => {
           loading && <Loader />
         }
         <LoginButton />
-        {relation && <SendMessageForm message={message} sendButton={sendButton} setMessage={setMessage} handleKeypress={handleKeypress} handleSend={handleSend} />}
+        {relation && (perfectDate==today) && <SendMessageForm message={message} sendButton={sendButton} setMessage={setMessage} handleKeypress={handleKeypress} handleSend={handleSend} />}
       </div>
       <ToastContainer />
     </div>

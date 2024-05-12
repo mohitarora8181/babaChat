@@ -7,7 +7,7 @@ const SendMessageForm = ({ message, sendButton, setMessage, handleKeypress, hand
     if (session) {
         return (
             <form className='flex justify-center h-[6rem] max-sm:h-[5.7rem]'>
-                <div className=' w-11/12 max-sm:w-full max-sm:px-3 p-5 flex justify-between'>
+                <div className=' w-full max-sm:w-full max-sm:px-3 p-5 flex justify-between'>
                     <textarea className='border text-black placeholder-gray-400 scrollbar-none border-black border-opacity-10 resize-none outline-none w-full p-3 pl-6 rounded-full align-middle shadow-lg shadow-gray-100'
                         type='text'
                         value={message}
