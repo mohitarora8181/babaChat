@@ -12,6 +12,21 @@ module.exports = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
+      keyframes: {
+        slideInLeft: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(0px);'  },
+        },
+        slideOutRight: {
+          '0%': { transform: 'translateX(0px)' },
+          '99%': { transform: 'translateX(-500%)'},
+          '100%':{display:"none"}
+        }
+      },
+      animation: {
+        slideIn: 'slideInLeft 0.5s ease-in-out',
+        slideOut: 'slideOutRight 0.5s ease-in-out',
+      }
     },
   },
   plugins: [require('tailwind-scrollbar')],

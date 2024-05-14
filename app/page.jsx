@@ -99,7 +99,7 @@ const Home = () => {
       relation
     });
     storeinDB(session.user, message);
-    setList(list => [...list, { message, recv: false, sender: { name: "Me", image: session.user.image } }]);
+    setList(list => [...list, { message, recv: false, sender: { name: "Me", image: session.user.image },time: timestamp.getTime() }]);
     sendButton.current?.focus();
     setMessage("");
   }
@@ -133,9 +133,9 @@ const Home = () => {
   return (
     <div className='flex bg-white select-none'>
       <AllUsers setRelation={setRelation} relation={relation} setList={setList} setActiveUser={setActiveUser} setLoading={setLoading} setChatDates={setChatDates} perfectDate={perfectDate} />
-      <div className="h-[98vh] pt-44 w-full max-sm:w-screen bg-white flex flex-col justify-end" >
+      <div className="h-[98vh] max-sm:pt-56 pt-44 w-full max-sm:w-screen bg-white flex flex-col justify-end" >
         {relation && <Header activeUser={activeUser} chatDates={chatDates} setPerfectDate={setPerfectDate} today={today}  />}
-        <div className={`w-full overflow-y-scroll scrollbar-thin ${perfectDate == today ? "mb-0" :"mb-10"}`}>
+        <div className={`w-full overflow-y-scroll scrollbar-thin ${perfectDate == today ? "mb-0 max-sm:mb-20" :"mb-10"}`}>
           <ul className="scroll-smooth flex flex-col" ref={ref}>
             <ChatElements list={list} />
           </ul>

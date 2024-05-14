@@ -1,4 +1,4 @@
-const ChatElements = ({list}) => {
+const ChatElements = ({ list }) => {
     return (
         list.map((ele, index) => {
             return <li className={`w-1/3 max-sm:w-3/5 max-sm:mx-[1.5rem] mx-[7rem] ${ele.recv ? "self-start" : "self-end"}`}
@@ -14,6 +14,7 @@ const ChatElements = ({list}) => {
                         </div>
                 }
                 <p className={`whitespace-pre-line break-words p-5 max-sm:p-2 my-1 rounded-lg rounded-tl-2xl rounded-br-2xl ${ele.recv ? "self-start bg-gradient-to-br from-green-200 to bg-green-100" : "self-end bg-gradient-to-br from-gray-200 to-gray-100"}`}>{ele.message}</p>
+                <p className={`text-sm ${ele.sender.name === "Me" ? " text-end" : " text-start"}`}>{ele.time}</p>
             </li>
         })
     )
