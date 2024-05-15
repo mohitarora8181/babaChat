@@ -5,13 +5,16 @@ import SignOutButton from './components/SignOutButton';
 
 export const metadata = {
   title: "Baba Chat",
-  description: "Personalised Chatting Environment"
+  description: "Personalised Chatting Environment - Developed By Mohit Arora 9667067062"
 }
 
 const RootLayout = ({ children }) => {
   return (
     <html lang="en" className='bg-white dark'>
-      <head><link rel="icon" href="images/baba-logo-01.png" sizes="any" /></head>
+      <head>
+        <link rel="icon" href="images/baba-logo-01.png" sizes="any" />
+        <meta name='description' content='Developed By Mohit Arora 9667067062'></meta>
+        </head>
       <body className='bg-no-repeat'>
         <Providers>
           <div className="flex align-middle w-full h-[4rem] bg-slate-200 absolute dark:bg-slate-800 justify-between">

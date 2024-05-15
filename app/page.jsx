@@ -85,7 +85,7 @@ const Home = () => {
         relDraft = atob(localStorage.getItem("relation"));
       }
       if (relDraft == data.relation) {
-        setList(list => [...list, { message: data.message, recv: true, sender: data.sender }]);
+        setList(list => [...list, { message: data.message, recv: true, sender: data.sender,time: new Date(timestamp.getTime()).toLocaleTimeString() }]);
       }
     });
   }
@@ -99,7 +99,7 @@ const Home = () => {
       relation
     });
     storeinDB(session.user, message);
-    setList(list => [...list, { message, recv: false, sender: { name: "Me", image: session.user.image },time: timestamp.getTime() }]);
+    setList(list => [...list, { message, recv: false, sender: { name: "Me", image: session.user.image },time: new Date(timestamp.getTime()).toLocaleTimeString() }]);
     sendButton.current?.focus();
     setMessage("");
   }
