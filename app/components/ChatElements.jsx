@@ -1,7 +1,7 @@
 const ChatElements = ({ list }) => {
     return (
         list.map((ele, index) => {
-            return <li className={`w-1/3 max-sm:w-3/5 max-sm:mx-[1.5rem] mx-[7rem] ${ele.recv ? "self-start" : "self-end"}`}
+            return <li className={`w-1/3 max-sm:w-3/5 max-sm:mx-[1.5rem] dark:text-black mx-[7rem] ${ele.recv ? "self-start" : "self-end"}`}
                 key={index}>
                 {
                     list[index - 1] && list[index - 1].sender.name == ele.sender.name ? "" :

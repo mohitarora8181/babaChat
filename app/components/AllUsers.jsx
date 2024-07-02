@@ -23,7 +23,7 @@ const AllUsers = ({ setRelation, relation, setList, setActiveUser, setLoading, s
 
 
   useEffect(() => {
-    setSearchedUsers(Object.values(allUsers).filter(ele => ele.email?.includes(searchUser)));
+    setSearchedUsers(Object.values(allUsers).filter(ele => ele.email?.includes(searchUser.toLocaleLowerCase())));
   }, [searchUser])
 
 
@@ -83,7 +83,7 @@ const AllUsers = ({ setRelation, relation, setList, setActiveUser, setLoading, s
         <FaHamburger className='self-center top-5 absolute ml-3 size-6 max-sm:block hidden' onClick={() => { if (isOpen) { setHideAnimate(true); setTimeout(() => { setOpen(!isOpen) }, 200); } else { setHideAnimate(false); setOpen(true) } }} />
         <div className={`${isOpen ? "max-sm:block" : "max-sm:hidden"} block h-[86vh] w-[30%] max-sm:absolute max-sm:z-20 max-sm:w-[95%] m-2 mt-[5rem] p-2 bg-white resize-x border-2 rounded-lg border-green-100 shadow-inner shadow-green-50 overflow-hidden transition-all ${hideAnimate ? "max-sm:animate-slideOut" : "max-sm:animate-slideIn"}`}>
           <div className="h-20 bg-transparent w-full flex justify-center">
-            <input onChange={e => setSearchUser(e.target.value)} value={searchUser} className="p-5 my-[20px] m-2 outline-gray-400 rounded-lg border border-gray-400 w-full" placeholder="Search by email...." type="text"></input>
+            <input onChange={e => setSearchUser(e.target.value)} value={searchUser} className="p-5 my-[20px] m-2 dark:text-black outline-gray-400 rounded-lg border border-gray-400 w-full" placeholder="Search by email...." type="text"></input>
           </div>
           <div className="h-[88%] overflow-y-scroll overflow-x-hidden scroll-smooth scrollbar-none">
             {
@@ -94,8 +94,8 @@ const AllUsers = ({ setRelation, relation, setList, setActiveUser, setLoading, s
                       <div key={"searched" + index} onClick={() => handleClick(ele)} className="m-3 mx-auto w-[90%] p-5 cursor-pointer select-none flex justify-start gap-5 align-middle rounded-xl bg-gray-100">
                         <img className='h-[48px] -ml-3 max-sm:h-[30px] rounded-full self-center' src={ele.image}></img>
                         <span className="self-center">
-                          <h1 className="h-fit self-center whitespace-nowrap text-nowrap">{ele.name}</h1>
-                          <p className="text-xs text-gray-400">{ele.email}</p>
+                          <h1 className="h-fit self-center whitespace-nowrap text-nowrap dark:text-black">{ele.name}</h1>
+                          <p className="text-xs text-gray-400 dark:text-black">{ele.email}</p>
                         </span>
                       </div>
                     )
@@ -108,8 +108,8 @@ const AllUsers = ({ setRelation, relation, setList, setActiveUser, setLoading, s
                       <div key={index} onClick={() => handleClick(ele)} className="m-3 mx-auto w-[90%] p-5 py-4 cursor-pointer select-none flex justify-start gap-5 align-middle rounded-xl bg-gray-100">
                         <img className='h-[48px] -ml-3 max-sm:h-[30px] rounded-full self-center' src={ele.image}></img>
                         <span className="self-center">
-                          <h1 className="h-fit self-center whitespace-nowrap text-nowrap">{ele.name}</h1>
-                          <p className="text-xs text-gray-400">{ele.email}</p>
+                          <h1 className="h-fit self-center whitespace-nowrap text-nowrap dark:text-black">{ele.name}</h1>
+                          <p className="text-xs text-gray-400 dark:text-black">{ele.email}</p>
                         </span>
                       </div>
                     )

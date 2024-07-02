@@ -23,7 +23,7 @@ const Header = ({ activeUser, chatDates, setPerfectDate, today }) => {
     }, [activeUser])
 
     return (
-        <div className={`flex max-sm:flex-col w-[65%] max-sm:w-[90%] justify-between align-middle px-5 absolute top-20 bg-white rounded-lg translate-x-12 max-sm:translate-x-4 p-2 border border-gray-400 gap-5`}>
+        <div className={`flex dark:text-black max-sm:flex-col w-[65%] max-sm:w-[90%] justify-between align-middle px-5 absolute top-20 bg-white rounded-lg translate-x-12 max-sm:translate-x-4 p-2 border border-gray-400 gap-5`}>
             <div className='flex gap-5' onClick={() => { console.log(today); setDefaultDate(today) }}>
                 <img className='h-[48px] max-sm:h-[30px] rounded-full self-center' src={activeUser.image}></img>
                 <span className="self-center">
